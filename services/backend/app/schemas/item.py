@@ -7,18 +7,30 @@ class Image(BaseModel):
     name: str
 
 
-class Item(BaseModel):
-    item_id: UUID
-    name: str = Field(max_length=50)
+class ItemBase(BaseModel):
+    title: str = Field(max_length=50)
     description: str = Field(max_length=250)
     price: float = None
-    tax: float | None = None
-    image: Image | None = None
+    #    image: Image | None = None
+
+
+class ItemCreate(ItemBase):
+    pass
+
+
+class Item(ItemBase):
+    id: UUID
+    owner_id: UUID
+
+
+    class Config:
+        orm_mode = True
+
 
 
 class Adventure(BaseModel):
     adventure_id = str
-    name: str = Field(max_length=50)
+    title: str = Field(max_length=50)
     description: str = Field(max_length=250)
     image: Image | None = None
     items: list[Item]

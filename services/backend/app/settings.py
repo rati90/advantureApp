@@ -6,4 +6,4 @@ load_dotenv(find_dotenv())
 SECRET_KEY = os.environ.get("SECRET_KEY")
 ALGORITHM = os.environ.get("ALGORITHM")
 ACCESS_TOKEN_EXPIRE_MINUTES = os.environ.get("ACCESS_TOKEN_EXPIRE_MINUTES")
-1
+SQLALCHEMY_DATABASE_URL = os.environ.get("SQLALCHEMY_DATABASE_URL")
