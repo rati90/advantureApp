@@ -4,16 +4,16 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from services.backend.app.db.database import get_db
-from services.backend.app.internal.auth import authenticate_user, create_access_token, get_current_active_user
+from services.backend.app.db.session import get_db
+from services.backend.app.core.security import authenticate_user, create_access_token, get_current_active_user
 from services.backend.app.schemas import Token
 from services.backend.app.schemas.user import User
 from services.backend.app.settings import ACCESS_TOKEN_EXPIRE_MINUTES
 
-router = APIRouter(prefix="", tags=["Log"])
+log = APIRouter(prefix="", tags=["Log"])
 
 
-@router.post("/token", response_model=Token)
+@log.post("/token", response_model=Token)
 async def login_for_access_token(
     db: AsyncSession = Depends(get_db),
     form_data: OAuth2PasswordRequestForm = Depends(),
@@ -27,15 +27,15 @@ async def login_for_access_token(
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token_expires = timedelta(minutes=int(ACCESS_TOKEN_EXPIRE_MINUTES))
 
     access_token = create_access_token(
-        user.username, expires_delta=access_token_expires
+        user.username, expires_deltas=access_token_expires
     )
 
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-@router.get("/me", response_model=User)
+@log.get("/me", response_model=User)
 async def read_users_me(current_user: User = Depends(get_current_active_user)):
     return current_user

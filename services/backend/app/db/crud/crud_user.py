@@ -3,8 +3,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from fastapi import status, HTTPException
 
-from ..models import User, Profile
-from ...internal import auth
+from services.backend.app.models import User, Profile
+from ...core import security
 from ...schemas import UserInDB, ProfileCreate
 
 
@@ -47,7 +47,7 @@ async def get_profile(db: AsyncSession, user_id: int):
 
 
 async def create_user(db: AsyncSession, user: UserInDB):
-    user.hashed_password = auth.get_password_hash(
+    user.hashed_password = security.get_password_hash(
         user.hashed_password
     )
 
@@ -102,3 +102,4 @@ async def user_is_admin(current_user: User):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="You are not authorized person",
         )
+

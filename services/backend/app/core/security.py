@@ -7,8 +7,8 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from services.backend.app.db.crud import users
-from services.backend.app.db.database import get_db
+from services.backend.app.db.crud import crud_user
+from services.backend.app.db.session import get_db
 from services.backend.app.schemas import TokenData, User
 from services.backend.app.settings import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 

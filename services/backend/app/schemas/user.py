@@ -1,11 +1,12 @@
 from pydantic import BaseModel
 from datetime import datetime
+from pydantic import EmailStr
 
 
 class UserBase(BaseModel):
     username: str
-    email: str
-    role: int
+    email: EmailStr
+    role: int = 1
     is_active: bool = True
 
 
