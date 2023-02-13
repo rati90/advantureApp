@@ -7,33 +7,20 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from services.backend.app.db.crud import users
-from services.backend.app.db.database import get_db
-from services.backend.app.schemas import TokenData, User
-from services.backend.app.settings import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
-
-
+from services.backend.app.db.crud import crud_user
+from services.backend.app.db.session import get_db
+from services.backend.app.schemas import TokenPayload, User
+from services.backend.app import settings
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-
-    return pwd_context.verify(plain_password, hashed_password)
-
-
-def get_password_hash(password: str) -> str:
-    return pwd_context.hash(password)
-
-
-async def authenticate_user(db: AsyncSession, username: str, password: str):
-
-    user = await users.get_user_by_username(db=db, username=username)
+async def authenticate_user(db: AsyncSession, email: str, password: str):
+    user = await crud_user.get_user(db=db, email=email)
     if not user:
         return False
     if not verify_password(password, user.hashed_password):
-        print(user.hashed_password)
         return False
 
     return user
@@ -47,16 +34,25 @@ def create_access_token(
         expire = datetime.utcnow() + expires_delta
     else:
         expire = datetime.utcnow() + timedelta(
-            minutes=ACCESS_TOKEN_EXPIRE_MINUTES
+            minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
         )
 
     to_encode = {"exp": expire, "sub": str(subject)}
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
     return encoded_jwt
 
 
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+
+    return pwd_context.verify(plain_password, hashed_password)
+
+
+def get_password_hash(password: str) -> str:
+    return pwd_context.hash(password)
+
+
 async def get_current_user(
-    token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db), token: str = Depends(oauth2_scheme)
 ):
 
     credentials_exception = HTTPException(
@@ -66,19 +62,18 @@ async def get_current_user(
     )
 
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None:
-            raise credentials_exception
-        token_data = TokenData(username=username)
+        payload = jwt.decode(
+            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+        )
+        token_data = TokenPayload(**payload)
     except JWTError:
         raise credentials_exception
 
-    user = await users.get_user_by_username(
-        db=db, username=token_data.username
+    user = await crud_user.get_user(
+        db=db, user_id=token_data.sub
     )
     if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=404, detail="User not fo333und")
     return user
 
 

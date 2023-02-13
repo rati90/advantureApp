@@ -2,14 +2,12 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import registry
 from sqlalchemy.orm import sessionmaker
 
-SQLALCHEMY_DATABASE_URL = (
-    "postgresql+asyncpg://postgres:22585@localhost:5432/postgres"
-)
+from ..settings import SQLALCHEMY_DATABASE_URL
 
-engine = create_async_engine(SQLALCHEMY_DATABASE_URL,future=True) # echo=True,
+engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=True,future=True)
 
 async_session = sessionmaker(
-    engine,
+    bind=engine,
     expire_on_commit=False,
     autocommit=False,
     autoflush=False,

@@ -3,7 +3,7 @@ import enum
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Enum, Text
 from sqlalchemy.orm import relationship
 
-from ..database import Base
+from services.backend.app.db.session import Base
 from .mixins import Timestamp
 
 
@@ -16,7 +16,6 @@ class User(Timestamp, Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
-    username = Column(String(100), unique=True, index=True, nullable=False)
     email = Column(String(100), unique=True, index=True, nullable=False)
     hashed_password = Column(String(300), nullable=False)
     role = Column(Enum(Role))

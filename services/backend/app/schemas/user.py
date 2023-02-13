@@ -3,13 +3,19 @@ from datetime import datetime
 
 
 class UserBase(BaseModel):
-    username: str
     email: str
-    role: int
+    role: int = 1
     is_active: bool = True
 
 
-class UserInDB(UserBase):
+class UserInDBBase(UserBase):
+    id: int | None = None
+
+    class Config:
+        orm_mode = True
+
+
+class UserInDB(UserInDBBase):
     hashed_password: str
 
 

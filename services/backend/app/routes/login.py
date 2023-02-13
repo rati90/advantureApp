@@ -4,21 +4,20 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from services.backend.app.db.database import get_db
+from services.backend.app.db.session import get_db
 from services.backend.app.internal.auth import authenticate_user, create_access_token, get_current_active_user
 from services.backend.app.schemas import Token
 from services.backend.app.schemas.user import User
 from services.backend.app.settings import ACCESS_TOKEN_EXPIRE_MINUTES
 
-router = APIRouter(prefix="", tags=["Log"])
+login = APIRouter(prefix="", tags=["Log"])
 
 
-@router.post("/token", response_model=Token)
+@login.post("/token", response_model=Token)
 async def login_for_access_token(
     db: AsyncSession = Depends(get_db),
     form_data: OAuth2PasswordRequestForm = Depends(),
 ):
-
     user = await authenticate_user(db, form_data.username, form_data.password)
 
     if not user:
@@ -36,6 +35,6 @@ async def login_for_access_token(
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-@router.get("/me", response_model=User)
+@login.get("/me", response_model=User)
 async def read_users_me(current_user: User = Depends(get_current_active_user)):
     return current_user
