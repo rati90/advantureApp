@@ -30,7 +30,7 @@ async def login_for_access_token(
     access_token_expires = timedelta(minutes=int(ACCESS_TOKEN_EXPIRE_MINUTES))
 
     access_token = create_access_token(
-        user.username, expires_deltas=access_token_expires
+        user.username, expires_delta=access_token_expires
     )
 
     return {"access_token": access_token, "token_type": "bearer"}
@@ -39,3 +39,4 @@ async def login_for_access_token(
 @log.get("/me", response_model=User)
 async def read_users_me(current_user: User = Depends(get_current_active_user)):
     return current_user
+

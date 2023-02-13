@@ -29,7 +29,7 @@ def get_password_hash(password: str) -> str:
 
 async def authenticate_user(db: AsyncSession, username: str, password: str):
 
-    user = await users.get_user_by_username(db=db, username=username)
+    user = await crud_user.get_user_by_username(db=db, username=username)
     if not user:
         return False
     if not verify_password(password, user.hashed_password):
@@ -74,7 +74,7 @@ async def get_current_user(
     except JWTError:
         raise credentials_exception
 
-    user = await users.get_user_by_username(
+    user = await crud_user.get_user_by_username(
         db=db, username=token_data.username
     )
     if not user:

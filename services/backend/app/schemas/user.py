@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from datetime import datetime
 from pydantic import EmailStr
-
+from uuid import UUID
 
 class UserBase(BaseModel):
     username: str
@@ -15,10 +15,11 @@ class UserInDB(UserBase):
 
 
 class User(UserBase):
-    id: int
+    id: UUID
     is_active: bool
     created_at: datetime
     updated_at: datetime
 
     class Config:
         orm_mode = True
+
