@@ -3,6 +3,7 @@ from datetime import datetime
 from pydantic import EmailStr
 from uuid import UUID
 
+
 class UserBase(BaseModel):
     username: str
     email: EmailStr

@@ -1,31 +1,31 @@
-from pydantic import BaseModel, Field, HttpUrl
+from pydantic import BaseModel, Field
 from uuid import UUID
-
+from datetime import datetime
 
 class Image(BaseModel):
-    url: HttpUrl
     name: str
+    image: bytes | None = None
 
 
 class ItemBase(BaseModel):
     title: str = Field(max_length=50)
     description: str = Field(max_length=250)
     price: float = None
-    #    image: Image | None = None
+    image: Image | None = None
 
 
 class ItemCreate(ItemBase):
-    pass
+    ...
 
 
 class Item(ItemBase):
     id: UUID
     owner_id: UUID
-
+    created_at: datetime
+    updated_at: datetime
 
     class Config:
         orm_mode = True
-
 
 
 class Adventure(BaseModel):

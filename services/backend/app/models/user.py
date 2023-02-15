@@ -1,10 +1,11 @@
 import enum
 
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Enum, Text
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Enum, Text, Float, LargeBinary
 from sqlalchemy.orm import relationship
 
-from services.backend.app.db.session import Base
+from ..db.session import Base
 from .mixins import Timestamp
+
 
 
 class Role(enum.IntEnum):
@@ -23,6 +24,7 @@ class User(Timestamp, Base):
     is_active = Column(Boolean, default=False)
 
     profile = relationship("Profile", back_populates="owner", uselist=False)
+    item = relationship("Item", back_populates="owner", uselist=False)
 
 
 class Profile(Timestamp, Base):
