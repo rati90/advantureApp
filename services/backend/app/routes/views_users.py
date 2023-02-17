@@ -80,7 +80,7 @@ async def create_new_profile(
 
 
 @router.patch("/profile")
-async def update_course(
+async def update_profile(
     update_info: dict[str, str],
     db: AsyncSession = Depends(
         get_db,

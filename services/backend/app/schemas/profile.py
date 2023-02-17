@@ -1,12 +1,13 @@
 from pydantic import BaseModel
 from datetime import datetime
+from uuid import UUID
 
 
 class ProfileBase(BaseModel):
     first_name: str
     last_name: str
     bio: str
-    user_id: int
+    user_id: UUID
 
 
 class ProfileCreate(ProfileBase):
@@ -14,7 +15,7 @@ class ProfileCreate(ProfileBase):
 
 
 class Profile(ProfileBase):
-    id: int
+    id: UUID
     created_at: datetime
     updated_at: datetime
 
