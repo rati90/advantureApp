@@ -1,13 +1,13 @@
 from fastapi import APIRouter, status, UploadFile, File, Depends, HTTPException, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-
-
+from uuid import UUID
+import base64
+from fastapi.encoders import jsonable_encoder
 from services.backend.app.db.session import get_db
 from ..core.security import get_current_active_user
-from ..schemas import ItemCreate, Image, Item, User
+from ..schemas import ItemCreate, ImageCreate, Item, User, Image
 from ..db.crud.crud_item import get_item_by_title, create_item
-from ..db.crud.crud_image import create_image
-
+from ..db.crud.crud_image import get_image_by_item, create_image
 
 route_item = APIRouter(
     prefix="/items",
@@ -25,21 +25,46 @@ async def create_new_item(
         db: AsyncSession = Depends(get_db),
         current_user: User = Depends(get_current_active_user)
 ):
-    #file: UploadFile
     db_item = await get_item_by_title(db=db, title=item.title)
     if db_item:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Item with this {db_item.title} title Already created",
         )
-    # image = Image()
-    # if image is not None:
-    #
-    #     image.file = file
-    #     await create_image(db=db, image=image)
-
-   # item.image = image
 
     return await create_item(db=db, item=item, user_id=current_user.id)
 
 
+@route_item.post(
+    "/create/{item_id}/image", status_code=status.HTTP_201_CREATED, response_model=Image
+
+)
+async def create_image_item(item_title: str,
+                            file: UploadFile = File(None),
+                            db: AsyncSession = Depends(get_db),
+                            current_user: User = Depends(get_current_active_user)
+                            ):
+    db_item = await get_item_by_title(db=db, title=item_title)
+    if not db_item:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Item with this {item_title} item already created",
+        )
+
+
+    db_image = await get_image_by_item(db=db, item_id=db_item.id)
+
+    if db_image:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Item om this {db_item.title} item already created",
+        )
+
+    file_name = file.filename
+    extension = file_name.split(".")[-1] in ("jpg", "jpeg", "png")
+    if not extension:
+        return {"error": "Invalid image format. Only JPG, JPEG and PNG are allowed."}
+    image = await file.read()
+#
+    #image = bytes(str(image), 'utf-8')
+    return await create_image(db=db, file=image, file_name=file_name, item_id=db_item.id)

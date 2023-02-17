@@ -18,21 +18,21 @@ class Item(Timestamp, Base):
     is_active = Column(Boolean, default=False)
     item_picture = Column(String, nullable=True)
     image_id = Column(UUID(as_uuid=uuid), nullable=True)
-    user_id = Column(UUID, ForeignKey("users.id"), unique=True, nullable=False)
+    user_id = Column(UUID, ForeignKey("users.id"), unique=False)
 
-    owner = relationship("User", back_populates="item", uselist=False)
+    owner = relationship("User", back_populates="item")
     image = relationship("Image", back_populates="item")
 
 
-class Image(Base):
+class Image(Timestamp, Base):
     __tablename__ = "images"
 
     id = Column(UUID(as_uuid=uuid), primary_key=True, index=True, default=uuid.uuid4)
-    name = Column(String(100), unique=True, index=True, nullable=True)
+    name = Column(String(100), unique=False, index=True, nullable=True)
     file = Column(LargeBinary)
-
     item_id = Column(UUID, ForeignKey("items.id"), unique=True, nullable=False)
 
     item = relationship("Item", back_populates="image")
+
 
 
