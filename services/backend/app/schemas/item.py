@@ -15,8 +15,7 @@ class ItemBase(BaseModel):
     title: str = Field(max_length=50)
     description: str = Field(max_length=250)
     price: float = None
-    image: Image | None = None
-    user_ud: UUID
+    image_id: UUID
 
 
 class ItemCreate(ItemBase):
@@ -25,7 +24,7 @@ class ItemCreate(ItemBase):
 
 class Item(ItemBase):
     id: UUID
-    owner_id: UUID
+    user_id: UUID
     created_at: datetime
     updated_at: datetime
 

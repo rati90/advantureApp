@@ -17,7 +17,8 @@ class Item(Timestamp, Base):
     price = Column(Float, index=True)
     is_active = Column(Boolean, default=False)
     item_picture = Column(String, nullable=True)
-    user_id = Column(UUID, ForeignKey("users.id"), unique=True, nullable=True)
+    image_id = Column(UUID(as_uuid=uuid), nullable=True)
+    user_id = Column(UUID, ForeignKey("users.id"), unique=True, nullable=False)
 
     owner = relationship("User", back_populates="item", uselist=False)
     image = relationship("Image", back_populates="item")

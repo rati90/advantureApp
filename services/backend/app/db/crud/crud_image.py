@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from services.backend.app.schemas import Image
+from services.backend.app.models import Image
 
 
 async def get_image_by_item(db: AsyncSession, item_id: str):
@@ -12,7 +12,11 @@ async def get_image_by_item(db: AsyncSession, item_id: str):
 
 async def create_image(db: AsyncSession, image: Image):
 
-    db_item = Image(**image.dict())
+    db_item = Image(
+        name=image.name,
+        file=image.file,
+        item_id=image.item_id
+    )
     db.add(db_item)
 
     await db.commit()

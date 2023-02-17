@@ -1,8 +1,10 @@
-from fastapi import APIRouter, status, UploadFile, File, Depends, HTTPException
+from fastapi import APIRouter, status, UploadFile, File, Depends, HTTPException, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
+
 from services.backend.app.db.session import get_db
-from services.backend.app.schemas import Item, Image
+from ..core.security import get_current_active_user
+from ..schemas import ItemCreate, Image, Item, User
 from ..db.crud.crud_item import get_item_by_title, create_item
 from ..db.crud.crud_image import create_image
 
@@ -19,23 +21,25 @@ route_item = APIRouter(
 
 )
 async def create_new_item(
-        item: Item, image: Image, file: UploadFile, db: AsyncSession = Depends(get_db)
+        item: ItemCreate,
+        db: AsyncSession = Depends(get_db),
+        current_user: User = Depends(get_current_active_user)
 ):
-
+    #file: UploadFile
     db_item = await get_item_by_title(db=db, title=item.title)
     if db_item:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Item with this {db_item.title} title Already created",
         )
+    # image = Image()
+    # if image is not None:
+    #
+    #     image.file = file
+    #     await create_image(db=db, image=image)
 
-    if image is not None:
+   # item.image = image
 
-        image.file = file
-        await create_image(db=db, image=image)
-
-    item.image = image
-
-    return create_item(db=db, item=item)
+    return await create_item(db=db, item=item, user_id=current_user.id)
 
 
