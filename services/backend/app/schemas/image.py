@@ -1,7 +1,24 @@
 from uuid import UUID
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, errors
+from typing import Any, Callable, Generator
+
+
+def hex_bytes_validator(val: Any) -> bytes:
+    if isinstance(val, bytes):
+        return val
+    elif isinstance(val, bytearray):
+        return bytes(val)
+    elif isinstance(val, str):
+        return bytes.fromhex(val)
+    raise errors.BytesError()
+
+
+class HexBytes(bytes):
+    @classmethod
+    def __get_validators__(cls) -> Generator[Callable[..., Any], None, None]:
+        yield hex_bytes_validator
 
 
 class ImageBase(BaseModel):
@@ -21,4 +38,4 @@ class Image(ImageBase):
 
     class Config:
         orm_mode = True
-        json_encoders = {bytes: lambda bs: "".join(map(chr, bs))}
+        json_encoders = {bytes: lambda bs: bs.hex()}
