@@ -1,4 +1,5 @@
-from .item import Item, Adventure, ItemCreate, ItemBase
+from .item import Item, ItemCreate, ItemBase
+from .adventure import Adventure, AdventureCreate
 from .image import ImageBase, Image, ImageCreate
 from .user import UserBase, UserInDB, User
 from .token import TokenData, Token

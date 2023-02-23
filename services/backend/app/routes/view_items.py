@@ -1,11 +1,8 @@
-from fastapi import APIRouter, status, UploadFile, File, Depends, HTTPException, Depends
+from fastapi import APIRouter, status, UploadFile, File, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from uuid import UUID
-import base64
-from fastapi.encoders import jsonable_encoder
 from services.backend.app.db.session import get_db
 from ..core.security import get_current_active_user
-from ..schemas import ItemCreate, ImageCreate, Item, User, Image
+from ..schemas import ItemCreate, Item, User, Image
 from ..db.crud.crud_item import get_item_by_title, create_item, get_items
 from ..db.crud.crud_image import get_image_by_item, create_image
 
@@ -54,9 +51,6 @@ async def read_item(item_title: str, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
     return db_item
-
-
-
 
 
 @router_item.post(

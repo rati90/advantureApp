@@ -1,6 +1,4 @@
-import enum
-
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Float, LargeBinary, UUID
+from sqlalchemy import Boolean, Column, ForeignKey, String, Float, LargeBinary, UUID
 from sqlalchemy.orm import relationship
 import uuid
 
@@ -22,6 +20,7 @@ class Item(Timestamp, Base):
 
     owner = relationship("User", back_populates="item")
     image = relationship("Image", back_populates="item")
+    adventures = relationship("Adventure", secondary="adventure_groups", back_populates="items")
 
 
 class Image(Timestamp, Base):
@@ -33,6 +32,5 @@ class Image(Timestamp, Base):
     item_id = Column(UUID, ForeignKey("items.id"), unique=True, nullable=False)
 
     item = relationship("Item", back_populates="image")
-
 
 

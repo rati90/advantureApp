@@ -1,22 +1,23 @@
-from pydantic import BaseModel, Field
 from uuid import UUID
 from datetime import datetime
+from pydantic import BaseModel, Field
 
 
-class ItemBase(BaseModel):
+from services.backend.app.schemas import Item
+
+
+class AdventureBase(BaseModel):
     title: str = Field(max_length=50)
     description: str = Field(max_length=250)
-    price: float = None
-    #image_id: UUID | None = None
 
 
-class ItemCreate(ItemBase):
+class AdventureCreate(AdventureBase):
     ...
 
 
-class Item(ItemBase):
-    id: UUID
-    user_id: UUID
+class Adventure(AdventureBase):
+    id = UUID
+    user_id = UUID
     created_at: datetime
     updated_at: datetime
 
