@@ -10,7 +10,7 @@ from services.backend.app.schemas import Adventure, AdventureCreate, User
 
 
 router_adventure = APIRouter(
-    prefix="/Adventure",
+    prefix="/adventure",
     tags=["ADVENTURES"],
     responses={404: {"description": "Not found"}},
 )
@@ -44,4 +44,19 @@ async def read_adventures(
     adventures = await get_adventures(db=db, skip=skip, limit=limit)
 
     return adventures
+
+
+@router_adventure.get("/{adventure_title}")
+async def read_adventure(adventure_title: str, db: AsyncSession = Depends(get_db)):
+    db_adventure = await get_adventure_by_title(db=db, adventure_title=adventure_title)
+
+    if db_adventure is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+    return db_adventure
+
+
+# adventure add item to current adventure
+
+# adventure delete item from group
 
