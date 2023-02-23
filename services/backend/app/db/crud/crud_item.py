@@ -6,10 +6,16 @@ from services.backend.app.models import Item
 from  services.backend.app.schemas import ItemCreate
 
 
-async def get_item_by_title(db: AsyncSession, title: str):
-    query = select(Item).where(Item.title == title)
+async def get_item_by_title(db: AsyncSession, item_title: str):
+    query = select(Item).where(Item.title == item_title)
     result = await db.execute(query)
     return result.scalar_one_or_none()
+
+
+async def get_items(db: AsyncSession, skip: int = 0, limit: int = 100):
+    query = select(Item)
+    result = await db.execute(query)
+    return result.scalars().all()
 
 
 async def create_item(db: AsyncSession,

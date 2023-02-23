@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .db.init_db import cli, init_models
-from .routes import router, log, route_item
+from .routes import router, log, router_item
 
 
 
@@ -11,7 +11,7 @@ def create_app() -> FastAPI:
 
     app.include_router(router)
     app.include_router(log)
-    app.include_router(route_item)
+    app.include_router(router_item)
 
     app.add_middleware(
         CORSMiddleware,

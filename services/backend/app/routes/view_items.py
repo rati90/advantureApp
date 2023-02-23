@@ -6,17 +6,17 @@ from fastapi.encoders import jsonable_encoder
 from services.backend.app.db.session import get_db
 from ..core.security import get_current_active_user
 from ..schemas import ItemCreate, ImageCreate, Item, User, Image
-from ..db.crud.crud_item import get_item_by_title, create_item
+from ..db.crud.crud_item import get_item_by_title, create_item, get_items
 from ..db.crud.crud_image import get_image_by_item, create_image
 
-route_item = APIRouter(
+router_item = APIRouter(
     prefix="/items",
     tags=["ITEMS"],
     responses={404: {"description": "Not found"}},
 )
 
 
-@route_item.post(
+@router_item.post(
     "/create", status_code=status.HTTP_201_CREATED, response_model=Item
 
 )
@@ -25,7 +25,7 @@ async def create_new_item(
         db: AsyncSession = Depends(get_db),
         current_user: User = Depends(get_current_active_user)
 ):
-    db_item = await get_item_by_title(db=db, title=item.title)
+    db_item = await get_item_by_title(db=db, item_title=item.title)
     if db_item:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -35,7 +35,31 @@ async def create_new_item(
     return await create_item(db=db, item=item, user_id=current_user.id)
 
 
-@route_item.post(
+@router_item.get("/all", response_model=list[Item])
+async def read_items(
+    db: AsyncSession = Depends(get_db),
+    skip: int = 0,
+    limit: int = 100,
+):
+    items = await get_items(db=db, skip=skip, limit=limit)
+
+    return items
+
+
+@router_item.get("/{item_title}")
+async def read_item(item_title: str, db: AsyncSession = Depends(get_db)):
+    db_item = await get_item_by_title(db=db, item_title=item_title)
+
+    if db_item is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+    return db_item
+
+
+
+
+
+@router_item.post(
     "/create/{item_id}/image", status_code=status.HTTP_201_CREATED, response_model=Image
 
 )
@@ -44,7 +68,7 @@ async def create_image_item(item_title: str,
                             db: AsyncSession = Depends(get_db),
                             current_user: User = Depends(get_current_active_user)
                             ):
-    db_item = await get_item_by_title(db=db, title=item_title)
+    db_item = await get_item_by_title(db=db, item_title=item_title)
     if not db_item:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
