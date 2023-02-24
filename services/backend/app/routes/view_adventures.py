@@ -4,7 +4,7 @@ from starlette import status
 
 from services.backend.app.core.security import get_current_active_user
 from services.backend.app.db.crud.crud_adventure import get_adventure_by_title, create_adventure, get_adventures, \
-    get_delete_adventure
+    get_delete_adventure, add_item_adventure
 from services.backend.app.db.crud.crud_item import get_item_by_title
 from services.backend.app.db.session import get_db
 from services.backend.app.schemas import Adventure, AdventureCreate, User
@@ -34,6 +34,31 @@ async def create_new_adventure(
     db_item = await get_item_by_title(db=db, item_title=item_title)
 
     return await create_adventure(db=db, adventure=adventure, item_id=db_item.id, user_id=current_user.id)
+
+
+@router_adventure.post("/add_item", status_code=status.HTTP_201_CREATED)
+async def add_new_item(
+        adventure_title: str,
+        item_title: str,
+        db: AsyncSession = Depends(get_db),
+        current_user: User = Depends(get_current_active_user)
+):
+    db_adventure = await get_adventure_by_title(db=db, adventure_title=adventure_title)
+    if db_adventure and db_adventure.user_id == current_user.id:
+        db_item = await get_item_by_title(db=db, item_title=item_title)
+        if db_item:
+            return await add_item_adventure(db=db, item_id=db_item.id, adventure_id=db_adventure.id)
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Item with this {item_title} title does not exists",
+            )
+
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Adventure with this {adventure_title} title does not exists",
+        )
 
 
 @router_adventure.get("/all", response_model=list[Adventure])

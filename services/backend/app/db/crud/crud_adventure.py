@@ -55,3 +55,20 @@ async def create_adventure(db: AsyncSession,
     await db.refresh(db_group)
 
     return db_adventure
+
+
+async def add_item_adventure(
+        db: AsyncSession,
+        item_id=UUID,
+        adventure_id=UUID
+
+):
+    db_group = AdventureGroup(
+        item_id=item_id,
+        adventure_id=adventure_id
+    )
+    db.add(db_group)
+    await db.commit()
+    await db.refresh(db_group)
+
+    return {"message": "item added to the adventure"}
