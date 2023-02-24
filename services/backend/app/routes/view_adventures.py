@@ -3,7 +3,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from services.backend.app.core.security import get_current_active_user
-from services.backend.app.db.crud.crud_adventure import get_adventure_by_title, create_adventure, get_adventures
+from services.backend.app.db.crud.crud_adventure import get_adventure_by_title, create_adventure, get_adventures, \
+    get_delete_adventure
 from services.backend.app.db.crud.crud_item import get_item_by_title
 from services.backend.app.db.session import get_db
 from services.backend.app.schemas import Adventure, AdventureCreate, User
@@ -56,7 +57,15 @@ async def read_adventure(adventure_title: str, db: AsyncSession = Depends(get_db
     return db_adventure
 
 
-# adventure add item to current adventure
+@router_adventure.delete("/{adventure_title}")
+async def delete_post(adventure_title: str,
+                      db: AsyncSession = Depends(get_db),
+                      current_user: User = Depends(get_current_active_user)):
+    db_adventure = await get_adventure_by_title(db=db, adventure_title=adventure_title)
+    if db_adventure and db_adventure.user_id == current_user.id:
+        return await get_delete_adventure(db=db, adventure_title=adventure_title)
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
-# adventure delete item from group
+
 

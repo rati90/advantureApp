@@ -1,5 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from sqlalchemy import delete
 from uuid import UUID
 import uuid
 from services.backend.app.models import Adventure, AdventureGroup
@@ -17,6 +18,13 @@ async def get_adventures(db: AsyncSession, skip: int = 0, limit: int = 100):
     query = select(Adventure)
     result = await db.execute(query)
     return result.scalars().all()
+
+
+async def get_delete_adventure(db: AsyncSession, adventure_title: str):
+    query = delete(Adventure).where(Adventure.title == adventure_title)
+    await db.execute(query)
+
+    return {"message": "deleted"}
 
 
 async def create_adventure(db: AsyncSession,
