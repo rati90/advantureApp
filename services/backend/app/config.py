@@ -8,8 +8,8 @@ from .routes import router, log, router_item, router_adventure
 def create_app() -> FastAPI:
     app = FastAPI()
 
-    app.include_router(router)
     app.include_router(log)
+    app.include_router(router)
     app.include_router(router_item)
     app.include_router(router_adventure)
 

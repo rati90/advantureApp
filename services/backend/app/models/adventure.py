@@ -21,6 +21,6 @@ class Adventure(Timestamp, Base):
 class AdventureGroup(Base):
     __tablename__ = "adventure_groups"
 
-    item_id = Column(UUID, ForeignKey("items.id"), primary_key=True)
-    adventure_id = Column(UUID, ForeignKey("adventures.id"), primary_key=True)
+    item_id = Column(UUID, ForeignKey("items.id", ondelete="CASCADE", onupdate="CASCADE"), primary_key=True)
+    adventure_id = Column(UUID, ForeignKey("adventures.id", ondelete="CASCADE", onupdate="CASCADE"), primary_key=True)
 

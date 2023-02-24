@@ -1,5 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from sqlalchemy import delete, update
 from uuid import UUID
 from services.backend.app.models import Item
 
@@ -16,6 +17,13 @@ async def get_items(db: AsyncSession, skip: int = 0, limit: int = 100):
     query = select(Item)
     result = await db.execute(query)
     return result.scalars().all()
+
+
+async def get_delete_item(db: AsyncSession, item_title: str):
+    query = delete(Item).where(Item.title == item_title)
+    await db.execute(query)
+
+    return {"message": "deleted"}
 
 
 async def create_item(db: AsyncSession,

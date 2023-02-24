@@ -20,7 +20,7 @@ class Item(Timestamp, Base):
 
     owner = relationship("User", back_populates="item")
     image = relationship("Image", back_populates="item")
-    adventures = relationship("Adventure", secondary="adventure_groups", back_populates="items")
+    adventures = relationship("Adventure", secondary="adventure_groups", back_populates="items", cascade="all, delete")
 
 
 class Image(Timestamp, Base):

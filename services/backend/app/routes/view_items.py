@@ -1,9 +1,11 @@
 from fastapi import APIRouter, status, UploadFile, File, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
+from uuid import UUID
+
 from services.backend.app.db.session import get_db
 from ..core.security import get_current_active_user
 from ..schemas import ItemCreate, Item, User, Image
-from ..db.crud.crud_item import get_item_by_title, create_item, get_items
+from ..db.crud.crud_item import get_item_by_title, create_item, get_items, get_delete_item
 from ..db.crud.crud_image import get_image_by_item, create_image
 
 router_item = APIRouter(
@@ -69,7 +71,6 @@ async def create_image_item(item_title: str,
             detail=f"Item with this {item_title} item already created",
         )
 
-
     db_image = await get_image_by_item(db=db, item_id=db_item.id)
 
     if db_image:
@@ -83,6 +84,16 @@ async def create_image_item(item_title: str,
     if not extension:
         return {"error": "Invalid image format. Only JPG, JPEG and PNG are allowed."}
     image = await file.read()
-#
-    #image = bytes(str(image), 'utf-8')
+
     return await create_image(db=db, file=image, file_name=file_name, item_id=db_item.id)
+
+
+@router_item.delete("/{item_title}")
+async def delete_post(item_title: str,
+                      db: AsyncSession = Depends(get_db),
+                      current_user: User = Depends(get_current_active_user)):
+    db_item = await get_item_by_title(db=db, item_title=item_title)
+    if db_item and db_item.user_id == current_user.id:
+        return await get_delete_item(db=db, item_title=item_title)
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
