@@ -4,7 +4,7 @@ from starlette import status
 
 from services.backend.app.core.security import get_current_active_user
 from services.backend.app.db.crud.crud_adventure import get_adventure_by_title, create_adventure, get_adventures, \
-    get_delete_adventure, add_item_adventure
+    get_delete_adventure, add_item_adventure, get_adventure_items
 from services.backend.app.db.crud.crud_item import get_item_by_title
 from services.backend.app.db.session import get_db
 from services.backend.app.schemas import Adventure, AdventureCreate, User
@@ -80,6 +80,17 @@ async def read_adventure(adventure_title: str, db: AsyncSession = Depends(get_db
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
     return db_adventure
+
+
+@router_adventure.get("/{adventure_title}/items")
+async def read_adventure_items(adventure_title: str, db: AsyncSession = Depends(get_db)):
+    db_adventure = await get_adventure_by_title(db=db, adventure_title=adventure_title)
+    if db_adventure is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+    adventure_items = await get_adventure_items(db=db, adventure_id=db_adventure.id)
+
+    return adventure_items
 
 
 @router_adventure.delete("/{adventure_title}")

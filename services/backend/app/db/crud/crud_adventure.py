@@ -20,6 +20,12 @@ async def get_adventures(db: AsyncSession, skip: int = 0, limit: int = 100):
     return result.scalars().all()
 
 
+async def get_adventure_items(db: AsyncSession, adventure_id: UUID, skip: int = 0, limit: int = 100):
+    query = select(AdventureGroup).where(AdventureGroup.adventure_id == adventure_id)
+    result = await db.execute(query)
+    return result.scalars().all()
+
+
 async def get_delete_adventure(db: AsyncSession, adventure_title: str):
     query = delete(Adventure).where(Adventure.title == adventure_title)
     await db.execute(query)
