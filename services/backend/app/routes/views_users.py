@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..core.security import get_current_active_user
 from ..db.session  import get_db
-from ..schemas import User, UserInDB, ProfileCreate, Profile
+from ..schemas import User, UserInDB, ProfileCreate, Profile, UserCreate
 
 from ..db.crud.crud_user import (
     get_users,
@@ -27,15 +27,17 @@ router = APIRouter(
 @router.post(
     "/create", status_code=status.HTTP_201_CREATED, response_model=User
 )
-async def create_new_user(user: UserInDB, db: AsyncSession = Depends(get_db)):
-    db_user = await get_user_by_email(db=db, email=user.email)
+async def create_new_user(user_in: UserCreate,
+                          db: AsyncSession = Depends(get_db),
+                          ):
+    db_user = await get_user_by_email(db=db, email=user_in.email)
     if db_user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"User with this {db_user.email} email Already created",
         )
 
-    return await create_user(db=db, user=user)
+    return await create_user(db=db, user=user_in)
 
 
 @router.get("/all", response_model=list[User])

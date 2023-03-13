@@ -5,7 +5,7 @@ from fastapi import status, HTTPException
 
 from services.backend.app.models import User, Profile
 from ...core import security
-from ...schemas import UserInDB, ProfileCreate
+from ...schemas import ProfileCreate, UserCreate
 
 
 async def get_user(db: AsyncSession, user_id: int):
@@ -46,15 +46,15 @@ async def get_profile(db: AsyncSession, user_id: int):
     return result.scalar_one_or_none()
 
 
-async def create_user(db: AsyncSession, user: UserInDB):
-    user.hashed_password = security.get_password_hash(
-        user.hashed_password
+async def create_user(db: AsyncSession, user: UserCreate):
+    user.password = security.get_password_hash(
+        user.password
     )
 
     db_user = User(
         username=user.username,
         email=user.email,
-        hashed_password=user.hashed_password,
+        hashed_password=user.password,
         role=user.role,
         is_active=user.is_active,
     )

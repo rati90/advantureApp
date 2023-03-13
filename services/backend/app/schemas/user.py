@@ -11,8 +11,13 @@ class UserBase(BaseModel):
     is_active: bool = True
 
 
-class UserInDB(UserBase):
-    hashed_password: str
+class UserCreate(UserBase):
+    email: EmailStr
+    password: str
+
+
+class UserUpdate(UserBase):
+    password: str | None = None
 
 
 class User(UserBase):
@@ -24,3 +29,6 @@ class User(UserBase):
     class Config:
         orm_mode = True
 
+
+class UserInDB(UserBase):
+    hashed_password: str
