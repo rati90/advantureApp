@@ -26,7 +26,6 @@ class CRUDItem(CRUDBase[Item, ItemCreate, ItemUpdate]):
 
         return {"message": "deleted"}
 
-
     async def create(self,
                      user_id: UUID,
                      db: AsyncSession,

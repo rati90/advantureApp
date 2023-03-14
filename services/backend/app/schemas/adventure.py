@@ -14,6 +14,8 @@ class AdventureBase(BaseModel):
 class AdventureCreate(AdventureBase):
     ...
 
+class AdventureUpdate(AdventureBase):
+    ...
 
 class Adventure(AdventureBase):
     id = UUID
