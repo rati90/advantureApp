@@ -5,7 +5,8 @@ from starlette import status
 from services.backend.app.core.security import get_current_active_user
 from services.backend.app.db.crud.crud_adventure import get_adventure_by_title, create_adventure, get_adventures, \
     get_delete_adventure, add_item_adventure, get_adventure_items
-from services.backend.app.db.crud.crud_item import get_item_by_title
+
+from ..db.crud.crud_item import item
 from services.backend.app.db.session import get_db
 from services.backend.app.schemas import Adventure, AdventureCreate, User
 
@@ -31,7 +32,7 @@ async def create_new_adventure(
             detail=f"Adventure with this {db_adventure.title} title Already created",
         )
 
-    db_item = await get_item_by_title(db=db, item_title=item_title)
+    db_item = await item.get_by_title(db=db, item_title=item_title)
 
     return await create_adventure(db=db, adventure=adventure, item_id=db_item.id, user_id=current_user.id)
 
@@ -45,7 +46,7 @@ async def add_new_item(
 ):
     db_adventure = await get_adventure_by_title(db=db, adventure_title=adventure_title)
     if db_adventure and db_adventure.user_id == current_user.id:
-        db_item = await get_item_by_title(db=db, item_title=item_title)
+        db_item = await item.get_by_title(db=db, item_title=item_title)
         if db_item:
             return await add_item_adventure(db=db, item_id=db_item.id, adventure_id=db_adventure.id)
         else:

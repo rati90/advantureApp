@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
 
 from ..core.security import get_current_active_user
-from ..db.session  import get_db
+from ..db.session import get_db
 from ..schemas import User, UserCreate, Profile, ProfileCreate, ProfileUpdate
 
 from ..db.crud.crud_user import user

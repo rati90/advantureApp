@@ -1,6 +1,5 @@
 from typing import Union, Any
 
-from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from fastapi import status, HTTPException

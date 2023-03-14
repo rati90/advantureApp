@@ -2,46 +2,47 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy import delete, update
 from uuid import UUID
+
+from .base import CRUDBase
 from services.backend.app.models import Item
 
-from  services.backend.app.schemas import ItemCreate
+from services.backend.app.schemas import ItemCreate, ItemUpdate
 
 
-async def get_item_by_title(db: AsyncSession, item_title: str):
-    query = select(Item).where(Item.title == item_title)
-    result = await db.execute(query)
-    return result.scalar_one_or_none()
+class CRUDItem(CRUDBase[Item, ItemCreate, ItemUpdate]):
+    async def get_by_title(self,
+                           db: AsyncSession,
+                           *,
+                           title: str) -> Item | None:
+        query = select(Item).where(Item.title == title)
+        result = await db.execute(query)
+        return result.scalar_one_or_none()
+
+    async def remove_by_title(self,
+                              db: AsyncSession,
+                              title: str):
+        query = delete(Item).where(Item.title == title)
+        await db.execute(query)
+
+        return {"message": "deleted"}
 
 
-async def get_items(db: AsyncSession, skip: int = 0, limit: int = 100):
-    query = select(Item)
-    result = await db.execute(query)
-    return result.scalars().all()
+    async def create(self,
+                     user_id: UUID,
+                     db: AsyncSession,
+                     *,
+                     obj_in: ItemCreate) -> Item:
+        db_obj = Item(
+            title=obj_in.title,
+            description=obj_in.description,
+            price=obj_in.price,
+            user_id=user_id,
+        )
+        db.add(db_obj)
+        await db.commit()
+        await db.refresh(db_obj)
+        return db_obj
 
 
-async def get_delete_item(db: AsyncSession, item_title: str):
-    query = delete(Item).where(Item.title == item_title)
-    await db.execute(query)
+item = CRUDItem(Item)
 
-    return {"message": "deleted"}
-
-
-async def create_item(db: AsyncSession,
-                      item: ItemCreate,
-                      user_id: UUID,
-                      ):
-
-    db_item = Item(
-        title=item.title,
-        description=item.description,
-        price=item.price,
-        user_id=user_id,
-
-    )
-
-    db.add(db_item)
-
-    await db.commit()
-    await db.refresh(db_item)
-
-    return db_item

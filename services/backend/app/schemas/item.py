@@ -13,6 +13,9 @@ class ItemBase(BaseModel):
 class ItemCreate(ItemBase):
     ...
 
+class ItemUpdate(ItemBase):
+    ...
+
 
 class Item(ItemBase):
     id: UUID

@@ -4,12 +4,12 @@ from uuid import UUID
 
 from services.backend.app.db.session import get_db
 from ..core.security import get_current_active_user
-from ..schemas import ItemCreate, Item, User, Image
-from ..db.crud.crud_item import get_item_by_title, create_item, get_items, get_delete_item
+from ..schemas import ItemCreate, Item, User, Image, ItemUpdate
+from ..db.crud.crud_item import item
 from ..db.crud.crud_image import get_image_by_item, create_image
 
 router_item = APIRouter(
-    prefix="/items",
+    prefix="/item",
     tags=["ITEMS"],
     responses={404: {"description": "Not found"}},
 )
@@ -20,39 +20,64 @@ router_item = APIRouter(
 
 )
 async def create_new_item(
-        item: ItemCreate,
+        item_in: ItemCreate,
         db: AsyncSession = Depends(get_db),
         current_user: User = Depends(get_current_active_user)
 ):
-    db_item = await get_item_by_title(db=db, item_title=item.title)
+    db_item = await item.get_by_title(db=db, title=item_in.title)
     if db_item:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Item with this {db_item.title} title Already created",
         )
 
-    return await create_item(db=db, item=item, user_id=current_user.id)
+    return await item.create(db=db, obj_in=item_in, user_id=current_user.id)
 
 
 @router_item.get("/all", response_model=list[Item])
 async def read_items(
-    db: AsyncSession = Depends(get_db),
-    skip: int = 0,
-    limit: int = 100,
+        db: AsyncSession = Depends(get_db),
+        skip: int = 0,
+        limit: int = 100,
 ):
-    items = await get_items(db=db, skip=skip, limit=limit)
+    items = await item.get_multi(db=db, skip=skip, limit=limit)
 
     return items
 
 
 @router_item.get("/{item_title}")
 async def read_item(item_title: str, db: AsyncSession = Depends(get_db)):
-    db_item = await get_item_by_title(db=db, item_title=item_title)
+    db_item = await item.get_by_title(sdb=db, title=item_title)
 
     if db_item is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
     return db_item
+
+
+@router_item.patch("/{item_title}")
+async def update_item(
+        item_in: ItemUpdate,
+        item_title: str,
+        db: AsyncSession = Depends(get_db),
+        current_user: User = Depends(get_current_active_user),
+):
+    db_item = await item.get_by_title(db=db, title=item_title)
+    if db_item and db_item.user_id == current_user.id:
+        return await item.update(db=db, db_obj=db_item, obj_in=item_in)
+
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+
+@router_item.delete("/{item_title}")
+async def delete_item(item_title: str,
+                      db: AsyncSession = Depends(get_db),
+                      current_user: User = Depends(get_current_active_user)):
+    db_item = await item.get_by_title(db=db, title=item_title)
+    if db_item and db_item.user_id == current_user.id:
+        return await item.remove_by_title(db=db, title=item_title)
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
 @router_item.post(
@@ -64,7 +89,7 @@ async def create_image_item(item_title: str,
                             db: AsyncSession = Depends(get_db),
                             current_user: User = Depends(get_current_active_user)
                             ):
-    db_item = await get_item_by_title(db=db, item_title=item_title)
+    db_item = await item.get_by_title(db=db, title=item_title)
     if not db_item:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -86,14 +111,3 @@ async def create_image_item(item_title: str,
     image = await file.read()
 
     return await create_image(db=db, file=image, file_name=file_name, item_id=db_item.id)
-
-
-@router_item.delete("/{item_title}")
-async def delete_post(item_title: str,
-                      db: AsyncSession = Depends(get_db),
-                      current_user: User = Depends(get_current_active_user)):
-    db_item = await get_item_by_title(db=db, item_title=item_title)
-    if db_item and db_item.user_id == current_user.id:
-        return await get_delete_item(db=db, item_title=item_title)
-    else:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
