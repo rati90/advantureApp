@@ -1,6 +1,6 @@
 import enum
 
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Enum, Text, Float, LargeBinary, UUID
+from sqlalchemy import Boolean, Column, ForeignKey, String, Enum, Text, UUID
 from sqlalchemy.orm import relationship
 import uuid
 

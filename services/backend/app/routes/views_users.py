@@ -1,24 +1,16 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
+from uuid import UUID
 
 from ..core.security import get_current_active_user
 from ..db.session  import get_db
-from ..schemas import User, UserInDB, ProfileCreate, Profile, UserCreate
+from ..schemas import User, UserCreate, Profile, ProfileCreate, ProfileUpdate
 
-from ..db.crud.crud_user import (
-    get_users,
-    get_user,
-    create_user,
-    get_user_by_email,
-    get_profile,
-    create_profile,
-    get_update_profile,
-    user_is_admin,
-)
-
+from ..db.crud.crud_user import user
+from ..db.crud.crud_profile import profile
 
 router = APIRouter(
-    prefix="/users",
+    prefix="/user",
     tags=["USERS"],
     responses={404: {"description": "Not found"}},
 )
@@ -30,14 +22,14 @@ router = APIRouter(
 async def create_new_user(user_in: UserCreate,
                           db: AsyncSession = Depends(get_db),
                           ):
-    db_user = await get_user_by_email(db=db, email=user_in.email)
+    db_user = await user.get_by_email(db=db, email=user_in.email)
     if db_user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"User with this {db_user.email} email Already created",
         )
 
-    return await create_user(db=db, user=user_in)
+    return await user.create(db=db, obj_in=user_in)
 
 
 @router.get("/all", response_model=list[User])
@@ -47,8 +39,8 @@ async def read_users(
     limit: int = 100,
     current_user: User = Depends(get_current_active_user),
 ):
-    if await user_is_admin(current_user):
-        users = await get_users(db=db, skip=skip, limit=limit)
+    if await user.is_admin(current_user):
+        users = await user.get_multi(db=db, skip=skip, limit=limit)
         return users
 
 
@@ -57,7 +49,7 @@ async def read_user_profile(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
 ):
-    db_profile = await get_profile(db=db, user_id=current_user.id)
+    db_profile = await profile.get_by_user(db=db, user_id=current_user.id)
     if db_profile is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return db_profile
@@ -65,43 +57,41 @@ async def read_user_profile(
 
 @router.post("/profile/create", response_model=Profile)
 async def create_new_profile(
-    profile: ProfileCreate,
+    profile_in: ProfileCreate,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
 ):
-    db_profile = await get_profile(db=db, user_id=current_user.id)
+    db_profile = await profile.get_by_user(db=db, user_id=current_user.id)
     if db_profile:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Profile already exists",
         )
 
-    return await create_profile(
-        db=db, profile=profile, user_id=current_user.id
+    return await profile.create(
+        db=db, obj_in=profile_in, user_id=current_user.id
     )
 
 
 @router.patch("/profile")
 async def update_profile(
-    update_info: dict[str, str],
-    db: AsyncSession = Depends(
-        get_db,
-    ),
+    profile_in: ProfileUpdate,
+    db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
 ):
 
-    db_profile = await get_profile(db=db, user_id=current_user.id)
+    db_profile = await profile.get_by_user(db=db, user_id=current_user.id)
     if db_profile:
-        return await get_update_profile(
-            db=db, user_id=current_user.id, update_info=update_info
+        return await profile.update(
+            db=db, db_obj=db_profile, obj_in=profile_in,
         )
 
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
 @router.get("/{user_id}")
-async def read_user(user_id: int, db: AsyncSession = Depends(get_db)):
-    db_user = await get_user(db=db, user_id=user_id)
+async def read_user(user_id: UUID, db: AsyncSession = Depends(get_db)):
+    db_user = await user.get(db=db, id=user_id)
 
     if db_user is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)

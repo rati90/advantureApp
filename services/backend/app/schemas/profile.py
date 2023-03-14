@@ -12,6 +12,9 @@ class ProfileBase(BaseModel):
 class ProfileCreate(ProfileBase):
     ...
 
+class ProfileUpdate(ProfileBase):
+    ...
+
 
 class Profile(ProfileBase):
     id: UUID

@@ -7,7 +7,7 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from services.backend.app.db.crud import crud_user
+from services.backend.app.db.crud.crud_user import user
 from services.backend.app.db.session import get_db
 from services.backend.app.schemas import TokenData, User
 from services.backend.app.settings import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
@@ -28,14 +28,13 @@ def get_password_hash(password: str) -> str:
 
 async def authenticate_user(db: AsyncSession, username: str, password: str):
 
-    user = await crud_user.get_user_by_username(db=db, username=username)
-    if not user:
+    user_auth = await user.get_by_username(db=db, username=username)
+    if not user_auth:
         return False
-    if not verify_password(password, user.hashed_password):
-        print(user.hashed_password)
+    if not verify_password(password, user_auth.hashed_password):
         return False
 
-    return user
+    return user_auth
 
 
 def create_access_token(
@@ -73,12 +72,12 @@ async def get_current_user(
     except JWTError:
         raise credentials_exception
 
-    user = await crud_user.get_user_by_username(
+    user_auth = await user.get_by_username(
         db=db, username=token_data.username
     )
-    if not user:
+    if not user_auth:
         raise HTTPException(status_code=404, detail="User not found")
-    return user
+    return user_auth
 
 
 async def get_current_active_user(
