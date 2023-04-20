@@ -30,6 +30,10 @@ class ImageCreate(ImageBase):
     ...
 
 
+class ImageUpdate(ImageBase):
+    ...
+
+
 class Image(ImageBase):
     id: UUID
     item_id: UUID

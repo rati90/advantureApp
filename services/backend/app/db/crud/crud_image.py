@@ -2,27 +2,40 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from uuid import UUID
 
+from .base import CRUDBase
 from services.backend.app.models import Image
 
-
-async def get_image_by_item(db: AsyncSession, item_id: UUID):
-    query = select(Image).where(Image.item_id == item_id)
-    result = await db.execute(query)
-    return result.scalar_one_or_none()
+from services.backend.app.schemas import ImageCreate, ImageUpdate
 
 
-async def create_image(db: AsyncSession, file: bytes, file_name: str, item_id: UUID):
+class CRUDImage(CRUDBase[Image, ImageCreate, ImageUpdate]):
+    async def get_image_by_item(self,
+                                db: AsyncSession,
+                                *,
+                                item_id: UUID):
+        query = select(Image).where(Image.item_id == item_id)
+        result = await db.execute(query)
+        return result.scalar_one_or_none()
 
-    db_image = Image(
-        name=file_name,
-        file=file,
-        item_id=item_id,
 
-    )
-    db.add(db_image)
+    async def create(self,
+                     db: AsyncSession,
+                     file: bytes,
+                     file_name: str,
+                     item_id: UUID,) -> Image:
 
-    await db.commit()
-    await db.refresh(db_image)
 
-    return db_image
+        db_obj = Image(
+                name=file_name,
+                file=file,
+                item_id=item_id,
+            )
+        db.add(db_obj)
 
+        await db.commit()
+        await db.refresh(db_obj)
+
+        return db_obj
+
+
+image = CRUDImage(Image)

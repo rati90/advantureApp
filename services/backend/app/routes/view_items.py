@@ -6,7 +6,7 @@ from services.backend.app.db.session import get_db
 from ..core.security import get_current_active_user
 from ..schemas import ItemCreate, Item, User, Image, ItemUpdate
 from ..db.crud.crud_item import item
-from ..db.crud.crud_image import get_image_by_item, create_image
+from ..db.crud.crud_image import image
 
 router_item = APIRouter(
     prefix="/item",
@@ -47,7 +47,7 @@ async def read_items(
 
 @router_item.get("/{item_title}")
 async def read_item(item_title: str, db: AsyncSession = Depends(get_db)):
-    db_item = await item.get_by_title(sdb=db, title=item_title)
+    db_item = await item.get_by_title(db=db, title=item_title)
 
     if db_item is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
@@ -96,7 +96,7 @@ async def create_image_item(item_title: str,
             detail=f"Item with this {item_title} item already created",
         )
 
-    db_image = await get_image_by_item(db=db, item_id=db_item.id)
+    db_image = await image.get_image_by_item(db=db, item_id=db_item.id)
 
     if db_image:
         raise HTTPException(
@@ -108,6 +108,16 @@ async def create_image_item(item_title: str,
     extension = file_name.split(".")[-1] in ("jpg", "jpeg", "png")
     if not extension:
         return {"error": "Invalid image format. Only JPG, JPEG and PNG are allowed."}
-    image = await file.read()
+    in_image = await file.read()
 
-    return await create_image(db=db, file=image, file_name=file_name, item_id=db_item.id)
+    return await image.create(db=db, file=in_image, file_name=file_name, item_id=db_item.id)
+
+
+@router_item.get("/{item_title}/image")
+async def read_image(item_id: UUID, db: AsyncSession = Depends(get_db)):
+    db_image = await image.get_image_by_item(db=db, item_id=item_id)
+
+    if db_image is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+    return db_image
