@@ -23,7 +23,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         """
         self.model = model
 
-    async def get(self, db: AsyncSession, id: Any) -> ModelType | None:
+    async def get(self, db: AsyncSession, id: Any) -> Union[ModelType, None]:
         query = select(self.model).where(self.model.id == id)
         result = await db.execute(query)
         return result.scalar_one_or_none()
