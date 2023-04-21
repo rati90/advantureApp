@@ -3,9 +3,6 @@ from datetime import datetime
 from pydantic import BaseModel, Field
 
 
-from services.backend.app.schemas import Item
-
-
 class AdventureBase(BaseModel):
     title: str = Field(max_length=50)
     description: str = Field(max_length=250)

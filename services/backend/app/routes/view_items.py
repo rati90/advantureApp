@@ -2,7 +2,7 @@ from fastapi import APIRouter, status, UploadFile, File, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
 
-from services.backend.app.db.session import get_db
+from ..db.session import get_db
 from ..core.security import get_current_active_user
 from ..schemas import ItemCreate, Item, User, Image, ItemUpdate
 from ..db.crud.crud_item import item

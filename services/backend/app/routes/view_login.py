@@ -4,11 +4,11 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from services.backend.app.db.session import get_db
-from services.backend.app.core.security import authenticate_user, create_access_token, get_current_active_user
-from services.backend.app.schemas import Token
-from services.backend.app.schemas.user import User
-from services.backend.app.settings import ACCESS_TOKEN_EXPIRE_MINUTES
+from ..db.session import get_db
+from ..core.security import authenticate_user, create_access_token, get_current_active_user
+from ..schemas import Token
+from ..schemas import User
+from ..settings import ACCESS_TOKEN_EXPIRE_MINUTES
 
 log = APIRouter(prefix="", tags=["Log"])
 

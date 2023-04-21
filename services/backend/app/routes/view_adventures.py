@@ -6,8 +6,8 @@ from services.backend.app.core.security import get_current_active_user
 from ..db.crud.crud_adventure import adventure
 
 from ..db.crud.crud_item import item
-from services.backend.app.db.session import get_db
-from services.backend.app.schemas import Adventure, AdventureCreate, User
+from ..db.session import get_db
+from ..schemas import Adventure, AdventureCreate, User
 
 router_adventure = APIRouter(
     prefix="/adventure",
