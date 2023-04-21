@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from uuid import UUID
 
-from services.backend.app.models import Profile
+from ...models import Profile
 from ...schemas import ProfileCreate, ProfileUpdate
 
 

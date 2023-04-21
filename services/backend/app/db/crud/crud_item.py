@@ -4,9 +4,9 @@ from sqlalchemy import delete, update
 from uuid import UUID
 
 from .base import CRUDBase
-from services.backend.app.models import Item
+from ...models import Item
 
-from services.backend.app.schemas import ItemCreate, ItemUpdate
+from ...schemas import ItemCreate, ItemUpdate
 
 
 class CRUDItem(CRUDBase[Item, ItemCreate, ItemUpdate]):

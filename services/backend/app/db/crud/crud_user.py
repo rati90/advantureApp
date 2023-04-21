@@ -5,7 +5,7 @@ from sqlalchemy.future import select
 from fastapi import status, HTTPException
 
 from .base import CRUDBase
-from services.backend.app.models import User, Profile
+from ...models import User, Profile
 from ...core import security
 from ...schemas import UserCreate, UserUpdate
 

@@ -3,9 +3,9 @@ from sqlalchemy.future import select
 from uuid import UUID
 
 from .base import CRUDBase
-from services.backend.app.models import Image
+from ...models import Image
 
-from services.backend.app.schemas import ImageCreate, ImageUpdate
+from ...schemas import ImageCreate, ImageUpdate
 
 
 class CRUDImage(CRUDBase[Image, ImageCreate, ImageUpdate]):
