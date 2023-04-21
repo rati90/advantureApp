@@ -3,8 +3,8 @@ from sqlalchemy.future import select
 from sqlalchemy import delete
 from uuid import UUID
 import uuid
-from services.backend.app.models import Adventure, AdventureGroup
 
+from ...models import Adventure, AdventureGroup
 from .base import CRUDBase
 from ...schemas import AdventureCreate, AdventureUpdate
 
