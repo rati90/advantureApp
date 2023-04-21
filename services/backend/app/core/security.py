@@ -7,10 +7,10 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from services.backend.app.db.crud.crud_user import user
-from services.backend.app.db.session import get_db
-from services.backend.app.schemas import TokenData, User
-from services.backend.app.settings import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
+from ..db.crud.crud_user import user
+from ..db.session import get_db
+from ..schemas import TokenData, User
+from ..settings import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
