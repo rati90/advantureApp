@@ -1,6 +1,5 @@
 from typing import Any, TypeVar, Generic, Type, Union
 
-
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
