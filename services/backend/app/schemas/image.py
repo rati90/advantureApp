@@ -1,3 +1,5 @@
+from typing import Union
+
 from uuid import UUID
 from datetime import datetime
 
@@ -23,7 +25,7 @@ class HexBytes(bytes):
 
 class ImageBase(BaseModel):
     name: str
-    file: bytes | None = None
+    file: Union[bytes, None] = None
 
 
 class ImageCreate(ImageBase):

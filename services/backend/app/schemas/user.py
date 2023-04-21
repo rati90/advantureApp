@@ -1,3 +1,5 @@
+from typing import Union
+
 from pydantic import BaseModel
 from datetime import datetime
 from pydantic import EmailStr
@@ -17,7 +19,7 @@ class UserCreate(UserBase):
 
 
 class UserUpdate(UserBase):
-    password: str | None = None
+    password: Union[str, None] = None
 
 
 class User(UserBase):
