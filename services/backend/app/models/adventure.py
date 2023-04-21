@@ -3,8 +3,8 @@ import uuid
 from sqlalchemy import Column, UUID, String, ForeignKey
 from sqlalchemy.orm import relationship, backref
 
-from services.backend.app.db.session import Base
-from services.backend.app.models.mixins import Timestamp
+from ..db.session import Base
+from .mixins import  Timestamp
 
 
 class Adventure(Timestamp, Base):
