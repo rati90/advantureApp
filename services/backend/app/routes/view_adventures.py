@@ -2,7 +2,7 @@ from fastapi import APIRouter, status, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from services.backend.app.core.security import get_current_active_user
+from ..core.security import get_current_active_user
 from ..db.crud.crud_adventure import adventure
 
 from ..db.crud.crud_item import item
