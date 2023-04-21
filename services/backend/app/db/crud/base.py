@@ -1,4 +1,4 @@
-from typing import Any, TypeVar, Generic, Type, Union
+from typing import Any, TypeVar, Generic, Type, Union, List, Dict
 
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
@@ -29,7 +29,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 
     async def get_multi(
         self, db: AsyncSession, *, skip: int = 0, limit: int = 100
-    ) -> list[ModelType]:
+    ) -> List[ModelType]:
         query = select(self.model)
         result = await db.execute(query)
         return result.scalars().all()
@@ -47,7 +47,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         db: AsyncSession,
         *,
         db_obj: ModelType,
-        obj_in: Union[UpdateSchemaType, dict[str, Any]]
+        obj_in: Union[UpdateSchemaType, Dict[str, Any]]
     ) -> ModelType:
         obj_data = jsonable_encoder(db_obj)
         if isinstance(obj_in, dict):
