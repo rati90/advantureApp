@@ -35,6 +35,7 @@ class CRUDItem(CRUDBase[Item, ItemCreate, ItemUpdate]):
             title=obj_in.title,
             description=obj_in.description,
             price=obj_in.price,
+            category_id=obj_in.category_id,
             user_id=user_id,
         )
         db.add(db_obj)

@@ -11,7 +11,7 @@ from .mixins import Timestamp
 class Adventure(Timestamp, Base):
     __tablename__ = "adventures"
 
-    id = Column(UUID(as_uuid=uuid), primary_key=True, index=True, default=uuid.uuid4)
+    id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
     title = Column(String(100), unique=True, index=True, nullable=False)
     description = Column(String(250))
     user_id = Column(UUID, ForeignKey("users.id"), unique=False)

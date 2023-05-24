@@ -17,7 +17,7 @@ class Role(enum.IntEnum):
 class User(Timestamp, Base):
     __tablename__ = "users"
 
-    id = Column(UUID(as_uuid=uuid), primary_key=True, index=True, default=uuid.uuid4)
+    id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
     username = Column(String(100), unique=True, index=True, nullable=False)
     email = Column(String(100), unique=True, index=True, nullable=False)
     hashed_password = Column(String(300), nullable=False)
@@ -31,7 +31,7 @@ class User(Timestamp, Base):
 class Profile(Timestamp, Base):
     __tablename__ = "profiles"
 
-    id = Column(UUID(as_uuid=uuid), primary_key=True, index=True, default=uuid.uuid4)
+    id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
     first_name = Column(String(50), nullable=False)
     last_name = Column(String(50), nullable=False)
     bio = Column(Text, nullable=True)
