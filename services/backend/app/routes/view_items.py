@@ -4,15 +4,35 @@ from uuid import UUID
 
 from ..db.session import get_db
 from ..core.security import get_current_active_user
-from ..schemas import ItemCreate, Item, User, Image, ItemUpdate
+from ..schemas import ItemCreate, Item, User, Image, ItemUpdate, Category, CategoryCreate
 from ..db.crud.crud_item import item
 from ..db.crud.crud_image import image
+from ..db.crud.crud_category import category
 
 router_item = APIRouter(
     prefix="/item",
     tags=["ITEMS"],
     responses={404: {"description": "Not found"}},
 )
+
+
+@router_item.post(
+    "/category/create", status_code=status.HTTP_201_CREATED, response_model=Category
+)
+
+
+async def create_new_category(
+        category_in: CategoryCreate,
+        db: AsyncSession = Depends(get_db)
+):
+    db_category = await category.get_by_name(db=db, name=category_in.name)
+    if db_category:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Category with this {db_category.name} title Already created",
+        )
+
+    return await category.create(db=db, obj_in=category_in)
 
 
 @router_item.post(
@@ -121,3 +141,4 @@ async def read_image(item_id: UUID, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
     return db_image
+

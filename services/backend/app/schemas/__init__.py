@@ -4,4 +4,4 @@ from .image import ImageBase, Image, ImageCreate, ImageUpdate
 from .user import UserBase, UserInDB, User, UserUpdate, UserCreate
 from .token import TokenData, Token
 from .profile import Profile, ProfileCreate, ProfileBase, ProfileUpdate
-
+from .category import CategoryCreate, CategoryUpdate, Category

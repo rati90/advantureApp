@@ -1,10 +1,11 @@
 import uuid
+from sqlalchemy.dialects.postgresql import UUID
 
-from sqlalchemy import Column, UUID, String, ForeignKey
+from sqlalchemy import Column, String, ForeignKey
 from sqlalchemy.orm import relationship, backref
 
 from ..db.session import Base
-from .mixins import  Timestamp
+from .mixins import Timestamp
 
 
 class Adventure(Timestamp, Base):

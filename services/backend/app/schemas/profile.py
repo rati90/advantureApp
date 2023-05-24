@@ -12,6 +12,7 @@ class ProfileBase(BaseModel):
 class ProfileCreate(ProfileBase):
     ...
 
+
 class ProfileUpdate(ProfileBase):
     ...
 
